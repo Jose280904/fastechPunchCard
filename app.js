@@ -34,12 +34,14 @@ const firebaseConfig = {
 };
 
 const adminEmails = [
-  "jerodriguez2804@gmail.com",
+  "jerodriguez2804@gmail.com"
 ];
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+const appLayout = document.querySelector(".app-layout");
 
 const authBox = document.getElementById("authBox");
 const signupBox = document.getElementById("signupBox");
@@ -300,7 +302,6 @@ async function loadWeeklyRecords() {
 
     employees.forEach((employee) => {
       const totalMinutes = calculateWeeklyMinutes(employee.days);
-
       records.innerHTML += buildWeekTable(employee.name, employee.days, totalMinutes);
     });
   } catch (error) {
@@ -929,9 +930,11 @@ onAuthStateChanged(auth, async (user) => {
 
     if (cleanAdminEmails.includes(cleanEmail)) {
       adminBox.classList.remove("hidden");
+      appLayout.classList.remove("employee-only");
       await loadPendingTimeEditRequests();
     } else {
       adminBox.classList.add("hidden");
+      appLayout.classList.add("employee-only");
     }
 
     await loadMyTimeEditRequests();
@@ -944,6 +947,7 @@ onAuthStateChanged(auth, async (user) => {
     adminBox.classList.add("hidden");
     settingsIconBtn.classList.add("hidden");
     settingsModal.classList.add("hidden");
+    appLayout.classList.add("employee-only");
     currentUserName = "";
   }
 });

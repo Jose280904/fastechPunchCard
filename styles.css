@@ -461,6 +461,16 @@ button.secondary {
     gap: 22px;
   }
 
+   .employee-only {
+    display: flex !important;
+    justify-content: center;
+  }
+
+   .employee-only .left-panel {
+    width: 100%;
+    max-width: 650px;
+  }
+
   .left-panel {
     min-height: auto;
   }
