@@ -65,6 +65,11 @@ const editReason = document.getElementById("editReason");
 const myTimeEditRequests = document.getElementById("myTimeEditRequests");
 const timeEditRequests = document.getElementById("timeEditRequests");
 
+const signatureBox = document.getElementById("signatureBox");
+const signatureStatus = document.getElementById("signatureStatus");
+const signatureInput = document.getElementById("signatureInput");
+const submitSignatureBtn = document.getElementById("submitSignatureBtn");
+
 let currentUserName = "";
 
 setCurrentWeek();
@@ -224,6 +229,10 @@ document.getElementById("submitTimeEditBtn").addEventListener("click", async () 
 
 document.getElementById("loadTimeEditRequestsBtn").addEventListener("click", async () => {
   await loadPendingTimeEditRequests();
+});
+
+submitSignatureBtn.addEventListener("click", async () => {
+  await submitWeeklySignature();
 });
 
 timeEditRequests.addEventListener("click", async (event) => {
@@ -559,6 +568,82 @@ async function rejectTimeEditRequest(requestId) {
     await loadPendingTimeEditRequests();
   } catch (error) {
     alert(error.message);
+  }
+}
+
+async function submitWeeklySignature() {
+  const user = auth.currentUser;
+
+  if (!user) return;
+
+  const typedSignature = signatureInput.value.trim();
+
+  if (!typedSignature) {
+    alert("Please type your full name before submitting.");
+    return;
+  }
+
+  const cleanEmail = user.email.toLowerCase().trim();
+  const currentWeek = getCurrentWeekValue();
+  const signatureId = `${user.uid}_${currentWeek}`;
+
+  if (!currentUserName) {
+    currentUserName = await getEmployeeName(user.uid, cleanEmail);
+  }
+
+  try {
+    await setDoc(doc(db, "weeklySignatures", signatureId), {
+      employeeId: user.uid,
+      employeeName: currentUserName || cleanEmail,
+      employeeEmail: cleanEmail,
+      week: currentWeek,
+      signature: typedSignature,
+      signedAt: serverTimestamp()
+    });
+
+    signatureInput.value = "";
+    await checkWeeklySignature();
+
+    alert("Weekly e-signature submitted.");
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function checkWeeklySignature() {
+  const user = auth.currentUser;
+
+  if (!user) return;
+
+  const currentWeek = getCurrentWeekValue();
+  const signatureId = `${user.uid}_${currentWeek}`;
+
+  try {
+    const signatureDoc = await getDoc(doc(db, "weeklySignatures", signatureId));
+
+    if (signatureDoc.exists()) {
+      const data = signatureDoc.data();
+
+      signatureStatus.className = "info-box signature-complete";
+      signatureStatus.innerHTML = `
+        Signed for this week.<br>
+        <strong>Signature:</strong> ${escapeHTML(data.signature)}
+      `;
+
+      signatureInput.disabled = true;
+      submitSignatureBtn.disabled = true;
+      submitSignatureBtn.textContent = "Signature Complete";
+    } else {
+      signatureStatus.className = "info-box signature-needed";
+      signatureStatus.textContent = "You have not signed for this week yet.";
+
+      signatureInput.disabled = false;
+      submitSignatureBtn.disabled = false;
+      submitSignatureBtn.textContent = "Submit Weekly Signature";
+    }
+  } catch (error) {
+    signatureStatus.className = "info-box";
+    signatureStatus.textContent = "Unable to check signature status.";
   }
 }
 
@@ -911,6 +996,7 @@ onAuthStateChanged(auth, async (user) => {
     clockBox.classList.remove("hidden");
     myHistoryBox.classList.remove("hidden");
     timeEditBox.classList.remove("hidden");
+    signatureBox.classList.remove("hidden");
     settingsIconBtn.classList.remove("hidden");
 
     const cleanEmail = user.email.toLowerCase().trim();
@@ -938,12 +1024,14 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     await loadMyTimeEditRequests();
+    await checkWeeklySignature();
   } else {
     authBox.classList.remove("hidden");
     signupBox.classList.add("hidden");
     clockBox.classList.add("hidden");
     myHistoryBox.classList.add("hidden");
     timeEditBox.classList.add("hidden");
+    signatureBox.classList.add("hidden");
     adminBox.classList.add("hidden");
     settingsIconBtn.classList.add("hidden");
     settingsModal.classList.add("hidden");

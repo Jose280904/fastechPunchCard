@@ -25,7 +25,7 @@
     <img src="images/fcp-banner.png" alt="Fastech Critical Power Systems Logo" class="logo" />
   </header>
 
-  <main class="app-layout">
+  <main class="app-layout employee-only">
     <section class="left-panel">
       <section id="authBox" class="card">
         <h2>Login</h2>
@@ -74,6 +74,20 @@
         </div>
 
         <button id="logoutBtn" class="outline-btn">↪ Logout</button>
+      </section>
+
+      <section id="signatureBox" class="card hidden">
+        <h2>Weekly E-Signature</h2>
+        <p class="muted">Sign once per week to confirm your time records.</p>
+
+        <div id="signatureStatus" class="info-box">
+          Checking signature status...
+        </div>
+
+        <label for="signatureInput">Type your full name:</label>
+        <input id="signatureInput" type="text" placeholder="Full Name" />
+
+        <button id="submitSignatureBtn">Submit Weekly Signature</button>
       </section>
 
       <section id="timeEditBox" class="card hidden">

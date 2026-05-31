@@ -67,6 +67,16 @@ body::before {
   gap: 26px;
 }
 
+.employee-only {
+  display: flex !important;
+  justify-content: center;
+}
+
+.employee-only .left-panel {
+  width: 100%;
+  max-width: 700px;
+}
+
 .left-panel,
 .right-panel,
 .card {
@@ -168,6 +178,11 @@ button {
 
 button:hover {
   filter: brightness(1.08);
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .outline-btn,
@@ -279,6 +294,18 @@ button.secondary {
   padding: 18px;
   border-radius: 10px;
   border: 1px solid rgba(245, 196, 0, 0.35);
+}
+
+.signature-complete {
+  background: #d1f7df;
+  color: #136c34;
+  border: 1px solid rgba(19, 108, 52, 0.25);
+}
+
+.signature-needed {
+  background: #fff3cd;
+  color: #7a5a00;
+  border: 1px solid rgba(122, 90, 0, 0.25);
 }
 
 .employee-card,
@@ -461,12 +488,12 @@ button.secondary {
     gap: 22px;
   }
 
-   .employee-only {
+  .employee-only {
     display: flex !important;
     justify-content: center;
   }
 
-   .employee-only .left-panel {
+  .employee-only .left-panel {
     width: 100%;
     max-width: 650px;
   }
@@ -493,14 +520,4 @@ button.secondary {
     width: 50px;
     height: 50px;
   }
-}
-
-.employee-only {
-  display: flex !important;
-  justify-content: center;
-}
-
-.employee-only .left-panel {
-  width: 100%;
-  max-width: 700px;
 }
