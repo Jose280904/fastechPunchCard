@@ -24,13 +24,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: ,
-  authDomain: ,
-  projectId: ,
-  storageBucket: ,
-  messagingSenderId: ,
-  appId: 
-  measurementId: 
+  apiKey: "AIzaSyBQk8_MK3V3XxfQmRruMB8fNj0eQrJWopo",
+  authDomain: "fastech-timecard.firebaseapp.com",
+  projectId: "fastech-timecard",
+  storageBucket: "fastech-timecard.firebasestorage.app",
+  messagingSenderId: "270979072463",
+  appId: "1:270979072463:web:0e10e869a719ca1ab712ba",
+  measurementId: "G-T6K69H7Q7L"
 };
 
 const adminEmails = [
