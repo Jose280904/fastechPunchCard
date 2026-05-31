@@ -69,6 +69,7 @@ const signatureBox = document.getElementById("signatureBox");
 const signatureStatus = document.getElementById("signatureStatus");
 const signatureInput = document.getElementById("signatureInput");
 const submitSignatureBtn = document.getElementById("submitSignatureBtn");
+const weeklySignatures = document.getElementById("weeklySignatures");
 
 let currentUserName = "";
 
@@ -229,6 +230,10 @@ document.getElementById("submitTimeEditBtn").addEventListener("click", async () 
 
 document.getElementById("loadTimeEditRequestsBtn").addEventListener("click", async () => {
   await loadPendingTimeEditRequests();
+});
+
+document.getElementById("loadWeeklySignaturesBtn").addEventListener("click", async () => {
+  await loadWeeklySignatures();
 });
 
 submitSignatureBtn.addEventListener("click", async () => {
@@ -484,6 +489,57 @@ async function loadPendingTimeEditRequests() {
     });
 
     timeEditRequests.innerHTML = html || `<p class="info-box">No pending time edit requests.</p>`;
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function loadWeeklySignatures() {
+  weeklySignatures.innerHTML = "";
+
+  const selectedWeek = weekPicker.value;
+
+  if (!selectedWeek) {
+    alert("Please choose a week first.");
+    return;
+  }
+
+  try {
+    const q = query(collection(db, "weeklySignatures"), orderBy("signedAt", "desc"));
+    const snapshot = await getDocs(q);
+
+    let html = "";
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (data.week !== selectedWeek) return;
+
+      let signedAtText = "Signed";
+
+      if (data.signedAt && data.signedAt.toDate) {
+        signedAtText = data.signedAt.toDate().toLocaleString([], {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      }
+
+      html += `
+        <div class="request-card">
+          <h3>${escapeHTML(data.employeeName || data.employeeEmail)}</h3>
+          <p><strong>Email:</strong> ${escapeHTML(data.employeeEmail)}</p>
+          <p><strong>Week:</strong> ${escapeHTML(data.week)}</p>
+          <p><strong>Signature:</strong> ${escapeHTML(data.signature)}</p>
+          <p><strong>Signed At:</strong> ${escapeHTML(signedAtText)}</p>
+          <span class="status-pill status-approved">Signed</span>
+        </div>
+      `;
+    });
+
+    weeklySignatures.innerHTML = html || `<p class="info-box">No signatures found for this week.</p>`;
   } catch (error) {
     alert(error.message);
   }
@@ -1018,6 +1074,7 @@ onAuthStateChanged(auth, async (user) => {
       adminBox.classList.remove("hidden");
       appLayout.classList.remove("employee-only");
       await loadPendingTimeEditRequests();
+      await loadWeeklySignatures();
     } else {
       adminBox.classList.add("hidden");
       appLayout.classList.add("employee-only");
