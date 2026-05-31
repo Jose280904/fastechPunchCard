@@ -494,3 +494,13 @@ button.secondary {
     height: 50px;
   }
 }
+
+.employee-only {
+  display: flex !important;
+  justify-content: center;
+}
+
+.employee-only .left-panel {
+  width: 100%;
+  max-width: 700px;
+}
