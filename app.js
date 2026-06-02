@@ -220,6 +220,14 @@ document.getElementById("clockInBtn").addEventListener("click", async () => {
   await savePunch("Clock In");
 });
 
+document.getElementById("startLunchBtn").addEventListener("click", async () => {
+  await savePunch("Start Lunch");
+});
+
+document.getElementById("endLunchBtn").addEventListener("click", async () => {
+  await savePunch("End Lunch");
+});
+
 document.getElementById("clockOutBtn").addEventListener("click", async () => {
   await savePunch("Clock Out");
 });
@@ -913,16 +921,32 @@ function createDayCell(punches) {
 
 function calculateDailyMinutes(punches) {
   let totalMinutes = 0;
-  let clockInTime = null;
+  let workStartTime = null;
+  let lunchStartTime = null;
 
-  punches.forEach((punch) => {
+  const sortedPunches = [...punches].sort((a, b) => a.time - b.time);
+
+  sortedPunches.forEach((punch) => {
     if (punch.type === "Clock In") {
-      clockInTime = punch.time;
+      workStartTime = punch.time;
+      lunchStartTime = null;
     }
 
-    if (punch.type === "Clock Out" && clockInTime) {
-      totalMinutes += Math.round((punch.time - clockInTime) / 60000);
-      clockInTime = null;
+    if (punch.type === "Start Lunch" && workStartTime) {
+      totalMinutes += Math.round((punch.time - workStartTime) / 60000);
+      workStartTime = null;
+      lunchStartTime = punch.time;
+    }
+
+    if (punch.type === "End Lunch" && lunchStartTime) {
+      workStartTime = punch.time;
+      lunchStartTime = null;
+    }
+
+    if (punch.type === "Clock Out" && workStartTime) {
+      totalMinutes += Math.round((punch.time - workStartTime) / 60000);
+      workStartTime = null;
+      lunchStartTime = null;
     }
   });
 

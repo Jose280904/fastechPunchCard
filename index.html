@@ -69,8 +69,10 @@
         <p class="muted">Have a great day!</p>
 
         <div class="clock-actions">
-          <button id="clockInBtn">⏱ Clock In</button>
-          <button id="clockOutBtn">⏱ Clock Out</button>
+          <button id="clockInBtn">🟢 Clock In</button>
+          <button id="startLunchBtn">🍔 Start Lunch</button>
+          <button id="endLunchBtn">🔙 End Lunch</button>
+          <button id="clockOutBtn">🔴 Clock Out</button>
         </div>
 
         <button id="logoutBtn" class="outline-btn">↪ Logout</button>
@@ -92,7 +94,7 @@
 
       <section id="timeEditBox" class="card hidden">
         <h2>Time Edit Request</h2>
-        <p class="muted">Forgot to clock in or out? Submit a request for admin approval.</p>
+        <p class="muted">Forgot to clock in, lunch, or clock out? Submit a request for admin approval.</p>
 
         <label for="editDate">Date:</label>
         <input id="editDate" type="date" />
@@ -103,6 +105,8 @@
         <label for="editType">Punch Type:</label>
         <select id="editType">
           <option value="Clock In">Clock In</option>
+          <option value="Start Lunch">Start Lunch</option>
+          <option value="End Lunch">End Lunch</option>
           <option value="Clock Out">Clock Out</option>
         </select>
 
@@ -117,14 +121,14 @@
       </section>
 
       <section class="admin-request-section">
-       <h2>Weekly Signatures</h2>
-       <p class="muted">View employees who have signed for the selected week.</p>
+        <h2>Weekly Signatures</h2>
+        <p class="muted">View employees who have signed for the selected week.</p>
 
-       <button id="loadWeeklySignaturesBtn">Load Weekly Signatures</button>
+        <button id="loadWeeklySignaturesBtn">Load Weekly Signatures</button>
 
-       <div id="weeklySignatures">
-        <p class="info-box">No signatures loaded yet.</p>
-       </div>
+        <div id="weeklySignatures">
+          <p class="info-box">No signatures loaded yet.</p>
+        </div>
       </section>
 
       <section id="myHistoryBox" class="card hidden">

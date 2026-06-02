@@ -521,3 +521,23 @@ button.secondary {
     height: 50px;
   }
 }
+
+#clockInBtn {
+  background: linear-gradient(135deg, #16803c, #1fa650);
+  color: white;
+}
+
+#startLunchBtn {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  color: white;
+}
+
+#endLunchBtn {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+}
+
+#clockOutBtn {
+  background: linear-gradient(135deg, #991b1b, #dc2626);
+  color: white;
+}
