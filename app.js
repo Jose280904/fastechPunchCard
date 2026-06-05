@@ -283,6 +283,7 @@ async function loadWeeklyRecords() {
 
   try {
     const { startOfWeek, endOfWeek } = getWeekDateRange(selectedWeek);
+    const weekDates = getWeekDates(startOfWeek);
     const employeeNamesByEmail = await getEmployeeNamesByEmail();
 
     const q = query(collection(db, "punches"), orderBy("time", "asc"));
@@ -326,7 +327,13 @@ async function loadWeeklyRecords() {
 
     employees.forEach((employee) => {
       const totalMinutes = calculateWeeklyMinutes(employee.days);
-      records.innerHTML += buildWeekTable(employee.name, employee.days, totalMinutes);
+
+      records.innerHTML += buildWeekTable(
+        employee.name,
+        employee.days,
+        totalMinutes,
+        weekDates
+      );
     });
   } catch (error) {
     alert(error.message);
@@ -350,6 +357,7 @@ async function loadMyHistory() {
   try {
     const cleanEmail = user.email.toLowerCase().trim();
     const { startOfWeek, endOfWeek } = getWeekDateRange(selectedWeek);
+    const weekDates = getWeekDates(startOfWeek);
 
     const q = query(collection(db, "punches"), orderBy("time", "asc"));
     const snapshot = await getDocs(q);
@@ -377,13 +385,13 @@ async function loadMyHistory() {
     myHistoryRecords.innerHTML = `
       <table class="my-history-table">
         <tr>
-          ${createHeaderCell("Sunday")}
-          ${createHeaderCell("Monday")}
-          ${createHeaderCell("Tuesday")}
-          ${createHeaderCell("Wednesday")}
-          ${createHeaderCell("Thursday")}
-          ${createHeaderCell("Friday")}
-          ${createHeaderCell("Saturday")}
+          ${createHeaderCell("Sunday", weekDates[0])}
+          ${createHeaderCell("Monday", weekDates[1])}
+          ${createHeaderCell("Tuesday", weekDates[2])}
+          ${createHeaderCell("Wednesday", weekDates[3])}
+          ${createHeaderCell("Thursday", weekDates[4])}
+          ${createHeaderCell("Friday", weekDates[5])}
+          ${createHeaderCell("Saturday", weekDates[6])}
           <th>Total<br>Hours</th>
         </tr>
 
@@ -870,20 +878,20 @@ function addPunchToDay(days, data, dateObj) {
   });
 }
 
-function buildWeekTable(employeeName, days, totalMinutes) {
+function buildWeekTable(employeeName, days, totalMinutes, weekDates) {
   return `
     <div class="employee-card">
       <h3>${escapeHTML(employeeName)}</h3>
 
       <table class="week-table">
         <tr>
-          ${createHeaderCell("Sunday")}
-          ${createHeaderCell("Monday")}
-          ${createHeaderCell("Tuesday")}
-          ${createHeaderCell("Wednesday")}
-          ${createHeaderCell("Thursday")}
-          ${createHeaderCell("Friday")}
-          ${createHeaderCell("Saturday")}
+          ${createHeaderCell("Sunday", weekDates[0])}
+          ${createHeaderCell("Monday", weekDates[1])}
+          ${createHeaderCell("Tuesday", weekDates[2])}
+          ${createHeaderCell("Wednesday", weekDates[3])}
+          ${createHeaderCell("Thursday", weekDates[4])}
+          ${createHeaderCell("Friday", weekDates[5])}
+          ${createHeaderCell("Saturday", weekDates[6])}
           <th>Total<br>Hours</th>
         </tr>
 
@@ -902,8 +910,13 @@ function buildWeekTable(employeeName, days, totalMinutes) {
   `;
 }
 
-function createHeaderCell(dayName) {
-  return `<th>${dayName.slice(0, 3)}</th>`;
+function createHeaderCell(dayName, dateText = "") {
+  return `
+    <th>
+      <div>${dayName.slice(0, 3)}</div>
+      <small>${dateText}</small>
+    </th>
+  `;
 }
 
 function createDayCell(punches) {
@@ -993,6 +1006,23 @@ function getWeekDateRange(weekValue) {
   endOfWeek.setDate(startOfWeek.getDate() + 7);
 
   return { startOfWeek, endOfWeek };
+}
+
+function getWeekDates(startOfWeek) {
+  const dates = [];
+
+  for (let i = 0; i < 7; i++) {
+    const currentDate = new Date(startOfWeek);
+    currentDate.setDate(startOfWeek.getDate() + i);
+
+    const mm = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const dd = String(currentDate.getDate()).padStart(2, "0");
+    const yy = String(currentDate.getFullYear()).slice(-2);
+
+    dates.push(`${mm}-${dd}-${yy}`);
+  }
+
+  return dates;
 }
 
 function getCurrentWeekValue() {

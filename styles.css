@@ -391,6 +391,19 @@ button.secondary {
   font-weight: bold;
 }
 
+.week-table th div {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.week-table th small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--yellow);
+}
+
 .week-table td {
   background: white;
 }
@@ -473,6 +486,19 @@ button.secondary {
   color: var(--yellow);
 }
 
+.my-history-table th div {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.my-history-table th small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--yellow);
+}
+
 .my-history-table td {
   background: white;
 }
@@ -484,50 +510,6 @@ button.secondary {
 
 .my-history-table tr:last-child td {
   border-bottom: none;
-}
-
-@media (max-width: 900px) {
-  .site-header {
-    padding-top: 22px;
-  }
-
-  .app-layout {
-    grid-template-columns: 1fr;
-    gap: 22px;
-  }
-
-  .employee-only {
-    display: flex !important;
-    justify-content: center;
-  }
-
-  .employee-only .left-panel {
-    width: 100%;
-    max-width: 650px;
-  }
-
-  .left-panel {
-    min-height: auto;
-  }
-
-  .clock-actions,
-  .request-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .week-table,
-  .my-history-table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-
-  .settings-icon {
-    top: 14px;
-    right: 14px;
-    width: 50px;
-    height: 50px;
-  }
 }
 
 #clockInBtn {
@@ -579,4 +561,48 @@ button.secondary {
 
 #myTimeEditRequests::-webkit-scrollbar-thumb:hover {
   background: #c29500;
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    padding-top: 22px;
+  }
+
+  .app-layout {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .employee-only {
+    display: flex !important;
+    justify-content: center;
+  }
+
+  .employee-only .left-panel {
+    width: 100%;
+    max-width: 650px;
+  }
+
+  .left-panel {
+    min-height: auto;
+  }
+
+  .clock-actions,
+  .request-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .week-table,
+  .my-history-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .settings-icon {
+    top: 14px;
+    right: 14px;
+    width: 50px;
+    height: 50px;
+  }
 }
