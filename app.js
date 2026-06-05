@@ -67,6 +67,7 @@ const myTimeEditRequests = document.getElementById("myTimeEditRequests");
 const timeEditRequests = document.getElementById("timeEditRequests");
 
 const signatureBox = document.getElementById("signatureBox");
+const signatureAdminBox = document.getElementById("signatureAdminBox");
 const signatureStatus = document.getElementById("signatureStatus");
 const signatureInput = document.getElementById("signatureInput");
 const submitSignatureBtn = document.getElementById("submitSignatureBtn");
@@ -1077,8 +1078,10 @@ onAuthStateChanged(auth, async (user) => {
     clockBox.classList.remove("hidden");
     myHistoryBox.classList.remove("hidden");
     timeEditBox.classList.remove("hidden");
-    signatureBox.classList.remove("hidden");
     settingsIconBtn.classList.remove("hidden");
+
+    signatureBox.classList.add("hidden");
+    signatureAdminBox.classList.add("hidden");
 
     const cleanEmail = user.email.toLowerCase().trim();
 
@@ -1097,16 +1100,22 @@ onAuthStateChanged(auth, async (user) => {
 
     if (cleanAdminEmails.includes(cleanEmail)) {
       adminBox.classList.remove("hidden");
+      signatureAdminBox.classList.remove("hidden");
+      signatureBox.classList.add("hidden");
       appLayout.classList.remove("employee-only");
+
       await loadPendingTimeEditRequests();
       await loadWeeklySignatures();
     } else {
       adminBox.classList.add("hidden");
+      signatureAdminBox.classList.add("hidden");
+      signatureBox.classList.remove("hidden");
       appLayout.classList.add("employee-only");
+
+      await checkWeeklySignature();
     }
 
     await loadMyTimeEditRequests();
-    await checkWeeklySignature();
   } else {
     authBox.classList.remove("hidden");
     signupBox.classList.add("hidden");
@@ -1114,6 +1123,7 @@ onAuthStateChanged(auth, async (user) => {
     myHistoryBox.classList.add("hidden");
     timeEditBox.classList.add("hidden");
     signatureBox.classList.add("hidden");
+    signatureAdminBox.classList.add("hidden");
     adminBox.classList.add("hidden");
     settingsIconBtn.classList.add("hidden");
     settingsModal.classList.add("hidden");
