@@ -34,6 +34,7 @@ const firebaseConfig = {
 };
 
 const adminEmails = [
+  "centralwebservices@outlook.com",
   "jerodriguez2804@gmail.com",
   "osaddi@fastechcriticalpower.com"
 ];
