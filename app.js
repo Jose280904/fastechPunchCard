@@ -1878,7 +1878,7 @@ async function loadMyHistory() {
           ${createDayCell(days.Thursday)}
           ${createDayCell(days.Friday)}
           ${createDayCell(days.Saturday)}
-          <td class="total-hours">${formatMinutes(totalMinutes)}</td>
+          <td class="total-hours">${formatDecimalHours(totalMinutes)}</td>
         </tr>
       </table>
     `;
@@ -2184,7 +2184,7 @@ function buildWeekTable(employeeName, days, totalMinutes, weekDates) {
           ${createDayCell(days.Thursday)}
           ${createDayCell(days.Friday)}
           ${createDayCell(days.Saturday)}
-          <td class="total-hours">${formatMinutes(totalMinutes)}</td>
+          <td class="total-hours">${formatDecimalHours(totalMinutes)}</td>
         </tr>
       </table>
     </div>
