@@ -2302,10 +2302,20 @@ function calculateShiftMinutes(startTime, endTime) {
 }
 
 function formatMinutes(minutes) {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
+  const numericMinutes = Number(minutes) || 0;
+  const hours = Math.floor(numericMinutes / 60);
+  const mins = Math.round(numericMinutes % 60);
 
   return `${hours}h ${mins}m`;
+}
+
+function formatDecimalHours(minutes) {
+  const numericMinutes = Number(minutes) || 0;
+  const decimalHours = numericMinutes / 60;
+
+  return `${decimalHours
+    .toFixed(2)
+    .replace(/\.?0+$/, "")} hours`;
 }
 
 function getWeekDateRange(weekValue) {
