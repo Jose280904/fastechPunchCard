@@ -134,6 +134,15 @@ const myScheduleCalendar = $("myScheduleCalendar");
 const selectedScheduleDetails = $("selectedScheduleDetails");
 
 let currentUserName = "";
+let currentUserAccess = {
+  role: "employee",
+  canManageSchedules: false,
+  canManageTimeOff: false,
+  canManageTimeEdits: false,
+  canViewAllHours: false,
+  canManagePunches: false,
+  canViewSignatures: false
+};
 let currentEmployeeWeekStart = getStartOfWeek(new Date());
 
 setCurrentWeek();
@@ -221,6 +230,12 @@ menuOverlay.addEventListener("click", closeMenu);
 
 document.querySelectorAll(".menu-link").forEach((button) => {
   button.addEventListener("click", async () => {
+    const requiredPermission = button.dataset.permission;
+    if (requiredPermission && currentUserAccess[requiredPermission] !== true) {
+      alert("You do not have permission to open this page.");
+      return;
+    }
+
     showPage(button.dataset.page);
     closeMenu();
 
@@ -455,6 +470,62 @@ function closeMenu() {
   menuOverlay.classList.add("hidden");
 }
 
+function isFullAdmin() {
+  return currentUserAccess.role === "admin";
+}
+
+function canManageSchedules() {
+  return currentUserAccess.canManageSchedules === true;
+}
+
+function requirePermission(permissionName, message = "You do not have permission to use this feature.") {
+  if (currentUserAccess[permissionName] === true) return true;
+  alert(message);
+  showPage("clockPage");
+  return false;
+}
+
+async function loadCurrentUserAccess(user) {
+  const cleanEmail = user.email.toLowerCase().trim();
+  const legacyAdmin = adminEmails.some((email) => email.toLowerCase().trim() === cleanEmail);
+
+  let role = legacyAdmin ? "admin" : "employee";
+  let permissions = {};
+
+  try {
+    const employeeSnap = await getDoc(doc(db, "employees", user.uid));
+    if (employeeSnap.exists()) {
+      const data = employeeSnap.data();
+      if (["employee", "scheduler", "admin"].includes(data.role)) role = data.role;
+      permissions = data.permissions || {};
+    }
+  } catch (error) {
+    console.error("Unable to load employee permissions:", error);
+  }
+
+  currentUserAccess = {
+    role,
+    canManageSchedules: role === "admin" || role === "scheduler" || permissions.canManageSchedules === true,
+    canManageTimeOff: role === "admin" || permissions.canManageTimeOff === true,
+    canManageTimeEdits: role === "admin" || permissions.canManageTimeEdits === true,
+    canViewAllHours: role === "admin" || permissions.canViewAllHours === true,
+    canManagePunches: role === "admin" || permissions.canManagePunches === true,
+    canViewSignatures: role === "admin" || permissions.canViewSignatures === true
+  };
+}
+
+function applyAccessToUI() {
+  const hasAnyManagementAccess = Object.entries(currentUserAccess)
+    .some(([key, value]) => key !== "role" && value === true);
+
+  adminMenuLinks.classList.toggle("hidden", !hasAnyManagementAccess);
+
+  document.querySelectorAll("[data-permission]").forEach((element) => {
+    const permission = element.dataset.permission;
+    element.classList.toggle("hidden", currentUserAccess[permission] !== true);
+  });
+}
+
 function showPage(pageId) {
   document.querySelectorAll(".app-page").forEach((page) => {
     page.classList.add("hidden");
@@ -619,6 +690,7 @@ async function loadMyTimeOffRequests() {
 }
 
 async function loadPendingTimeOffRequests() {
+  if (!currentUserAccess.canManageTimeOff) return;
   try {
     const q = query(collection(db, "timeOffRequests"), orderBy("requestedAt", "desc"));
     const snapshot = await getDocs(q);
@@ -638,6 +710,7 @@ async function loadPendingTimeOffRequests() {
 }
 
 async function approveTimeOffRequest(requestId) {
+  if (!requirePermission("canManageTimeOff")) return;
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
@@ -663,6 +736,7 @@ async function approveTimeOffRequest(requestId) {
 }
 
 async function rejectTimeOffRequest(requestId) {
+  if (!requirePermission("canManageTimeOff")) return;
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
@@ -799,6 +873,7 @@ async function showScheduleDetailsForDate(dateValue) {
 
   const cleanEmail = user.email.toLowerCase().trim();
   const schedules = await getSchedulesForEmployee(cleanEmail);
+  const allDaySchedules = await getSchedulesForDate(dateValue);
   const timeOff = await getTimeOffForEmployee(cleanEmail);
 
   const daySchedules = schedules.filter((item) => item.date === dateValue);
@@ -836,9 +911,45 @@ async function showScheduleDetailsForDate(dateValue) {
     `;
   });
 
+  const coworkers = allDaySchedules.filter((shift) =>
+    shift.employeeEmail && shift.employeeEmail.toLowerCase().trim() !== cleanEmail
+  );
+
+  html += `<div class="schedule-card coworkers-card"><h3>Also Scheduled This Day</h3>`;
+
+  if (coworkers.length === 0) {
+    html += `<p class="muted">No other employees are scheduled for this day.</p>`;
+  } else {
+    coworkers.forEach((shift) => {
+      html += `
+        <div class="coworker-shift-row">
+          <strong>${escapeHTML(shift.employeeName || "Employee")}</strong>
+          <span>${formatTimeFrom24Hour(shift.startTime)} - ${formatTimeFrom24Hour(shift.endTime)}</span>
+          ${shift.location ? `<small>${escapeHTML(shift.location)}</small>` : ""}
+        </div>
+      `;
+    });
+  }
+
+  html += `</div>`;
+
   html += `</div>`;
 
   selectedScheduleDetails.innerHTML = html;
+}
+
+async function getSchedulesForDate(dateValue) {
+  const q = query(collection(db, "schedules"), orderBy("scheduleDateTime", "asc"));
+  const snapshot = await getDocs(q);
+  const schedules = [];
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (data.deleted === true || data.date !== dateValue) return;
+    schedules.push({ id: docSnap.id, ...data });
+  });
+
+  return schedules;
 }
 
 async function getSchedulesForEmployee(email) {
@@ -886,7 +997,7 @@ async function getTimeOffForEmployee(email) {
 
 
 async function loadScheduleEmployeeDropdown() {
-  if (!scheduleEmployeeSelect) return;
+  if (!canManageSchedules() || !scheduleEmployeeSelect) return;
 
   const currentValue = scheduleEmployeeSelect.value;
 
@@ -988,6 +1099,7 @@ function selectScheduleEmployeeByEmail(email) {
 }
 
 async function buildScheduleWeekGrid() {
+  if (!requirePermission("canManageSchedules", "You are not allowed to build schedules.")) return;
   const selectedWeek = adminScheduleBuilderWeekPicker.value;
   const employee = getSelectedScheduleEmployee();
 
@@ -1087,6 +1199,7 @@ async function buildScheduleWeekGrid() {
 }
 
 async function postEmployeeSchedule() {
+  if (!requirePermission("canManageSchedules", "You are not allowed to post schedules.")) return;
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
@@ -1166,6 +1279,7 @@ async function postEmployeeSchedule() {
 }
 
 async function saveScheduleEdit() {
+  if (!requirePermission("canManageSchedules", "You are not allowed to edit schedules.")) return;
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
@@ -1210,6 +1324,7 @@ async function saveScheduleEdit() {
 }
 
 async function removeScheduleShift() {
+  if (!requirePermission("canManageSchedules", "You are not allowed to remove schedules.")) return;
   const scheduleId = editingScheduleId.value;
 
   if (!scheduleId) {
@@ -1227,6 +1342,7 @@ async function removeScheduleShift() {
 }
 
 async function softDeleteSchedule(scheduleId) {
+  if (!requirePermission("canManageSchedules", "You are not allowed to remove schedules.")) return;
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
@@ -1298,6 +1414,7 @@ async function getApprovedTimeOffDates(employeeEmail) {
 }
 
 async function loadAdminSchedules() {
+  if (!canManageSchedules()) return;
   adminScheduleRecords.innerHTML = "";
 
   const selectedWeek = adminScheduleWeekPicker.value;
@@ -1495,6 +1612,7 @@ async function loadMyTimeEditRequests() {
 }
 
 async function loadPendingTimeEditRequests() {
+  if (!currentUserAccess.canManageTimeEdits) return;
   try {
     const q = query(collection(db, "timeEditRequests"), orderBy("requestedAt", "desc"));
     const snapshot = await getDocs(q);
@@ -1516,6 +1634,7 @@ async function loadPendingTimeEditRequests() {
 }
 
 async function approveTimeEditRequest(requestId) {
+  if (!requirePermission("canManageTimeEdits")) return;
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
@@ -1571,6 +1690,7 @@ async function approveTimeEditRequest(requestId) {
 }
 
 async function rejectTimeEditRequest(requestId) {
+  if (!requirePermission("canManageTimeEdits")) return;
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
@@ -1699,6 +1819,7 @@ async function checkWeeklySignature() {
 }
 
 async function loadWeeklySignatures() {
+  if (!currentUserAccess.canViewSignatures) return;
   weeklySignatures.innerHTML = "";
 
   const selectedWeek = weekPicker.value;
@@ -1750,6 +1871,7 @@ async function loadWeeklySignatures() {
 }
 
 async function loadWeeklyRecords() {
+  if (!requirePermission("canViewAllHours", "You are not allowed to view other employees’ hours.")) return;
   records.innerHTML = "";
 
   const selectedWeek = weekPicker.value;
@@ -1888,6 +2010,7 @@ async function loadMyHistory() {
 }
 
 async function loadAdminPunchEditor() {
+  if (!requirePermission("canManagePunches")) return;
   adminPunchEditorRecords.innerHTML = "";
 
   const selectedWeek = adminEditWeekPicker.value;
@@ -1984,6 +2107,7 @@ function openEditPunchModal(button) {
 }
 
 async function saveEditedPunch() {
+  if (!requirePermission("canManagePunches")) return;
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
@@ -2030,6 +2154,7 @@ async function saveEditedPunch() {
 }
 
 async function softDeletePunch(punchId) {
+  if (!requirePermission("canManagePunches")) return;
   const adminUser = auth.currentUser;
   if (!adminUser) return;
 
@@ -2513,23 +2638,8 @@ onAuthStateChanged(auth, async (user) => {
     currentUserName = await getEmployeeName(user.uid, cleanEmail);
     updateProfileUI(user);
 
-    const cleanAdminEmails = adminEmails.map((email) =>
-      email.toLowerCase().trim()
-    );
-
-    const isCurrentUserAdmin = cleanAdminEmails.includes(cleanEmail);
-
-    if (isCurrentUserAdmin) {
-      adminMenuLinks.classList.remove("hidden");
-      document.querySelectorAll(".admin-page").forEach((page) => {
-        page.classList.remove("admin-locked");
-      });
-    } else {
-      adminMenuLinks.classList.add("hidden");
-      document.querySelectorAll(".admin-page").forEach((page) => {
-        page.classList.add("admin-locked");
-      });
-    }
+    await loadCurrentUserAccess(user);
+    applyAccessToUI();
 
     showPage("clockPage");
 
@@ -2540,13 +2650,13 @@ onAuthStateChanged(auth, async (user) => {
     await loadMyTimeEditRequests();
     await loadMyTimeOffRequests();
 
-    if (isCurrentUserAdmin) {
+    if (currentUserAccess.canManageSchedules) {
       await loadScheduleEmployeeDropdown();
-      await loadPendingTimeEditRequests();
-      await loadPendingTimeOffRequests();
-      await loadWeeklySignatures();
       await loadAdminSchedules();
     }
+    if (currentUserAccess.canManageTimeEdits) await loadPendingTimeEditRequests();
+    if (currentUserAccess.canManageTimeOff) await loadPendingTimeOffRequests();
+    if (currentUserAccess.canViewSignatures) await loadWeeklySignatures();
   } else {
     authBox.classList.remove("hidden");
     signupBox.classList.add("hidden");
@@ -2559,5 +2669,14 @@ onAuthStateChanged(auth, async (user) => {
     editPunchModal.classList.add("hidden");
 
     currentUserName = "";
+    currentUserAccess = {
+      role: "employee",
+      canManageSchedules: false,
+      canManageTimeOff: false,
+      canManageTimeEdits: false,
+      canViewAllHours: false,
+      canManagePunches: false,
+      canViewSignatures: false
+    };
   }
 });
