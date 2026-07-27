@@ -36,14 +36,14 @@
     <button class="menu-link" data-page="signaturePage">Weekly Signature</button>
 
     <div id="adminMenuLinks" class="admin-menu-links hidden">
-      <p class="menu-section-title">Admin</p>
-      <button class="menu-link" data-page="adminScheduleBuilderPage">Schedule Builder</button>
-      <button class="menu-link" data-page="adminPostedSchedulesPage">Posted Schedules</button>
-      <button class="menu-link" data-page="adminTimeOffPage">Time Off Approvals</button>
-      <button class="menu-link" data-page="adminTimeEditPage">Time Edit Approvals</button>
-      <button class="menu-link" data-page="adminWeeklyRecordsPage">Weekly Records</button>
-      <button class="menu-link" data-page="adminSignaturesPage">Signatures Log</button>
-      <button class="menu-link" data-page="adminPunchEditorPage">Edit Punches</button>
+      <p class="menu-section-title">Management</p>
+      <button class="menu-link" data-page="adminScheduleBuilderPage" data-permission="canManageSchedules">Schedule Builder</button>
+      <button class="menu-link" data-page="adminPostedSchedulesPage" data-permission="canManageSchedules">Posted Schedules</button>
+      <button class="menu-link" data-page="adminTimeOffPage" data-permission="canManageTimeOff">Time Off Approvals</button>
+      <button class="menu-link" data-page="adminTimeEditPage" data-permission="canManageTimeEdits">Time Edit Approvals</button>
+      <button class="menu-link" data-page="adminWeeklyRecordsPage" data-permission="canViewAllHours">Weekly Records</button>
+      <button class="menu-link" data-page="adminSignaturesPage" data-permission="canViewSignatures">Signatures Log</button>
+      <button class="menu-link" data-page="adminPunchEditorPage" data-permission="canManagePunches">Edit Punches</button>
     </div>
 
     <button id="logoutBtn" class="menu-logout-btn">↪ Logout</button>
@@ -241,7 +241,7 @@
         </section>
       </section>
 
-      <section id="adminScheduleBuilderPage" class="app-page hidden admin-page">
+      <section id="adminScheduleBuilderPage" class="app-page hidden admin-page" data-permission="canManageSchedules">
         <section class="card">
           <h2>Schedule Builder</h2>
           <p class="muted">Select an employee and week. Existing shifts will show on each day to prevent double scheduling.</p>
@@ -297,7 +297,7 @@
         </section>
       </section>
 
-      <section id="adminPostedSchedulesPage" class="app-page hidden admin-page">
+      <section id="adminPostedSchedulesPage" class="app-page hidden admin-page" data-permission="canManageSchedules">
         <section class="card">
           <h2>Posted Schedules</h2>
           <p class="muted">Select a week, then click an employee to view or edit their schedule.</p>
@@ -313,7 +313,7 @@
         </section>
       </section>
 
-      <section id="adminTimeOffPage" class="app-page hidden admin-page">
+      <section id="adminTimeOffPage" class="app-page hidden admin-page" data-permission="canManageTimeOff">
         <section class="card">
           <h2>Time Off Approvals</h2>
           <p class="muted">Approve or reject employee time off requests.</p>
@@ -326,7 +326,7 @@
         </section>
       </section>
 
-      <section id="adminTimeEditPage" class="app-page hidden admin-page">
+      <section id="adminTimeEditPage" class="app-page hidden admin-page" data-permission="canManageTimeEdits">
         <section class="card">
           <h2>Time Edit Approvals</h2>
           <p class="muted">Approve or reject employee time edit requests.</p>
@@ -339,7 +339,7 @@
         </section>
       </section>
 
-      <section id="adminWeeklyRecordsPage" class="app-page hidden admin-page">
+      <section id="adminWeeklyRecordsPage" class="app-page hidden admin-page" data-permission="canViewAllHours">
         <section class="card">
           <h2>Weekly Records</h2>
           <p class="muted">View employee time clock records.</p>
@@ -355,7 +355,7 @@
         </section>
       </section>
 
-      <section id="adminSignaturesPage" class="app-page hidden admin-page">
+      <section id="adminSignaturesPage" class="app-page hidden admin-page" data-permission="canViewSignatures">
         <section id="signatureAdminBox" class="card">
           <h2>Weekly Signatures Log</h2>
           <p class="muted">View employees who have signed for the selected week.</p>
@@ -368,7 +368,7 @@
         </section>
       </section>
 
-      <section id="adminPunchEditorPage" class="app-page hidden admin-page">
+      <section id="adminPunchEditorPage" class="app-page hidden admin-page" data-permission="canManagePunches">
         <section class="card">
           <h2>Edit Employee Punches</h2>
           <p class="muted">Choose a week, then edit or delete employee punches.</p>

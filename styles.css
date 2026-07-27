@@ -1161,3 +1161,9 @@ button.secondary {
     padding: 16px;
   }
 }
+
+/* Coworkers scheduled on the selected day */
+.coworkers-card { margin-top: 14px; }
+.coworker-shift-row { display: grid; gap: 3px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.coworker-shift-row:last-child { border-bottom: 0; }
+.coworker-shift-row span, .coworker-shift-row small { color: var(--muted); }
