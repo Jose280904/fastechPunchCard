@@ -1,3 +1,31 @@
+/*
+ * FASTECH TIMECARD — DEVELOPER NAVIGATION GUIDE
+ * ------------------------------------------------------------
+ * This file's executable code is unchanged. Comments were added
+ * only to make future maintenance easier.
+ *
+ * MAIN AREAS (search these labels):
+ *  1. FIREBASE SETUP
+ *  2. DOM ELEMENT REFERENCES
+ *  3. APP STATE AND STARTUP
+ *  4. EVENT LISTENERS
+ *  5. MENU / ACCESS CONTROL
+ *  6. PUNCH CLOCK
+ *  7. TIME-OFF REQUESTS
+ *  8. EMPLOYEE SCHEDULE VIEW
+ *  9. ADMIN SCHEDULE BUILDER
+ * 10. TIME-EDIT REQUESTS
+ * 11. WEEKLY SIGNATURES
+ * 12. RECORDS / HISTORY / PUNCH EDITOR
+ * 13. EMPLOYEE PROFILE HELPERS
+ * 14. TIME, DATE, TABLE, AND SECURITY HELPERS
+ * 15. AUTHENTICATION STATE
+ *
+ * Important: Firestore collection names and object field names used
+ * here must stay aligned with the deployed Firestore security rules.
+ */
+
+/* ==================== 1. FIREBASE SETUP ==================== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
@@ -33,6 +61,7 @@ const firebaseConfig = {
   measurementId: "G-T6K69H7Q7L"
 };
 
+/* Legacy full-admin emails. Role/permission access is also loaded from employees/{uid}. */
 const adminEmails = [
   "centralwebservices@outlook.com",
   "jerodriguez2804@gmail.com",
@@ -43,6 +72,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* ==================== 2. DOM ELEMENT REFERENCES ====================
+ * Each constant below points to an element with the same id in index.html.
+ */
 const $ = (id) => document.getElementById(id);
 
 const authBox = $("authBox");
@@ -133,6 +165,9 @@ const myScheduleWeekTitle = $("myScheduleWeekTitle");
 const myScheduleCalendar = $("myScheduleCalendar");
 const selectedScheduleDetails = $("selectedScheduleDetails");
 
+/* ==================== 3. APP STATE AND STARTUP ====================
+ * currentUserAccess is the frontend permission snapshot for the signed-in employee.
+ */
 let currentUserName = "";
 let currentUserAccess = {
   role: "employee",
@@ -148,6 +183,9 @@ let currentEmployeeWeekStart = getStartOfWeek(new Date());
 setCurrentWeek();
 setTodayDate();
 
+/* ==================== 4. EVENT LISTENERS ====================
+ * Button, form, menu, calendar, and modal interactions are wired here.
+ */
 $("showPasswordBtn").addEventListener("click", () => togglePassword("password", "showPasswordBtn"));
 $("showSignupPasswordBtn").addEventListener("click", () => togglePassword("signupPassword", "showSignupPasswordBtn"));
 $("showConfirmPasswordBtn").addEventListener("click", () => togglePassword("confirmPassword", "showConfirmPasswordBtn"));
@@ -460,6 +498,9 @@ myScheduleCalendar.addEventListener("click", async (event) => {
   await showScheduleDetailsForDate(dayBtn.dataset.date);
 });
 
+/* ==================== 5. MENU / ACCESS CONTROL ====================
+ * Controls navigation visibility and permission-based page access.
+ */
 function openMenu() {
   sideMenu.classList.remove("hidden");
   menuOverlay.classList.remove("hidden");
@@ -544,6 +585,9 @@ function showPage(pageId) {
   });
 }
 
+/* ==================== 6. PUNCH CLOCK ====================
+ * Creates employee clock/lunch punches and calculates the current clock state.
+ */
 async function savePunch(type) {
   const user = auth.currentUser;
   if (!user) return;
@@ -617,6 +661,9 @@ async function loadClockStatus() {
   }
 }
 
+/* ==================== 7. TIME-OFF REQUESTS ====================
+ * Employee submission plus manager loading, approval, rejection, and cards.
+ */
 async function submitTimeOffRequest() {
   const user = auth.currentUser;
   if (!user) return;
@@ -790,6 +837,9 @@ function buildAdminTimeOffCard(requestId, data) {
   `;
 }
 
+/* ==================== 8. EMPLOYEE SCHEDULE VIEW ====================
+ * Loads the signed-in employee's week and selected-day coworker details.
+ */
 async function loadMyWeeklySchedule() {
   const user = auth.currentUser;
   if (!user) return;
@@ -996,6 +1046,9 @@ async function getTimeOffForEmployee(email) {
 }
 
 
+/* ==================== 9. ADMIN SCHEDULE BUILDER ====================
+ * Employee selection, weekly grid, shift posting/editing/removal, and admin views.
+ */
 async function loadScheduleEmployeeDropdown() {
   if (!canManageSchedules() || !scheduleEmployeeSelect) return;
 
@@ -1535,6 +1588,9 @@ function buildAdminEmployeeScheduleGroup(employee, index) {
   return html;
 }
 
+/* ==================== 10. TIME-EDIT REQUESTS ====================
+ * Employee requests and manager approval/rejection. Approval also creates a punch.
+ */
 async function submitTimeEditRequest() {
   const user = auth.currentUser;
   if (!user) return;
@@ -1744,6 +1800,9 @@ function buildAdminRequestCard(requestId, data) {
   `;
 }
 
+/* ==================== 11. WEEKLY SIGNATURES ====================
+ * Saves employee weekly acknowledgements and loads them for authorized viewers.
+ */
 async function submitWeeklySignature() {
   const user = auth.currentUser;
   if (!user) return;
@@ -1870,6 +1929,9 @@ async function loadWeeklySignatures() {
   }
 }
 
+/* ==================== 12. RECORDS / HISTORY / PUNCH EDITOR ====================
+ * Weekly admin records, employee history, and authorized punch corrections.
+ */
 async function loadWeeklyRecords() {
   if (!requirePermission("canViewAllHours", "You are not allowed to view other employees’ hours.")) return;
   records.innerHTML = "";
@@ -2182,6 +2244,9 @@ async function softDeletePunch(punchId) {
   }
 }
 
+/* ==================== 13. EMPLOYEE PROFILE HELPERS ====================
+ * Reads and saves employee identity/profile data used throughout the app.
+ */
 async function saveEmployeeName(uid, email, name, isNewAccount) {
   const cleanEmail = email.toLowerCase().trim();
 
@@ -2249,6 +2314,9 @@ function updateProfileUI(user) {
   profileEmailText.textContent = cleanEmail;
 }
 
+/* ==================== 14. TIME, DATE, TABLE, AND SECURITY HELPERS ====================
+ * Shared rendering, calculations, formatting, escaping, and date utilities.
+ */
 function emptyWeek() {
   return {
     Sunday: [],
@@ -2625,6 +2693,9 @@ function escapeHTML(value) {
     .replaceAll("'", "&#039;");
 }
 
+/* ==================== 15. AUTHENTICATION STATE ====================
+ * Main startup/teardown flow whenever a user signs in or signs out.
+ */
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     authBox.classList.add("hidden");

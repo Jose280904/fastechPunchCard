@@ -1,3 +1,12 @@
+/*
+ * FASTECH TIMECARD — STYLE NAVIGATION
+ * -----------------------------------
+ * Styling values and selectors are unchanged. Section comments were added only.
+ * Main areas: reset/theme, header/menu, cards/forms, records, schedules,
+ * tables/modals, responsive layouts, and selected-day coworker display.
+ */
+
+/* ==================== RESET AND THEME VARIABLES ==================== */
 * {
   box-sizing: border-box;
 }
@@ -57,6 +66,7 @@ body::before {
   display: none !important;
 }
 
+/* ==================== HEADER AND SIDE MENU ==================== */
 .site-header {
   width: 100%;
   max-width: 1100px;
@@ -201,6 +211,7 @@ body::before {
   overflow-x: hidden;
 }
 
+/* ==================== AUTHENTICATION, CARDS, AND FORMS ==================== */
 .auth-card {
   width: min(520px, 100%);
   margin: 18px auto;
@@ -470,6 +481,7 @@ button.secondary {
 }
 
 .employee-card,
+/* ==================== REQUESTS, RECORDS, AND STATUS CARDS ==================== */
 .request-card,
 .admin-punch-row,
 .schedule-card,
@@ -674,6 +686,7 @@ button.secondary {
   text-align: center;
 }
 
+/* ==================== SCHEDULE BUILDER AND WEEKLY SCHEDULES ==================== */
 .schedule-week-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(128px, 1fr));
@@ -965,6 +978,7 @@ button.secondary {
   color: var(--blue);
 }
 
+/* ==================== RESPONSIVE: TABLET / SMALL DESKTOP ==================== */
 @media (max-width: 900px) {
   .site-header {
     padding-top: 20px;
@@ -1027,6 +1041,7 @@ button.secondary {
   }
 }
 
+/* ==================== RESPONSIVE: MOBILE ==================== */
 @media (max-width: 700px) {
   .app-shell {
     padding: 10px;
@@ -1101,6 +1116,7 @@ button.secondary {
   }
 }
 
+/* ==================== RESPONSIVE: SMALL MOBILE ==================== */
 @media (max-width: 420px) {
   .app-shell {
     padding: 8px;

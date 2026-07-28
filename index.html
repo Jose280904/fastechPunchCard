@@ -17,11 +17,21 @@
 </head>
 
 <body>
+<!--
+  FASTECH TIMECARD — HTML NAVIGATION
+  ----------------------------------
+  Executable markup is unchanged; comments identify the major screens.
+  JavaScript locates controls by their id attributes, so avoid renaming an id
+  unless the matching reference in app.js is updated at the same time.
+-->
+
+  <!-- GLOBAL HEADER / MOBILE MENU BUTTON -->
   <header class="site-header">
     <button id="hamburgerBtn" class="hamburger-btn hidden">☰</button>
     <img src="images/fcp-banner.png" alt="Fastech Critical Power Systems Logo" class="logo" />
   </header>
 
+  <!-- SIDE NAVIGATION: employee links plus permission-controlled admin links -->
   <nav id="sideMenu" class="side-menu hidden">
     <div class="side-menu-header">
       <h3>Menu</h3>
@@ -52,6 +62,7 @@
   <div id="menuOverlay" class="menu-overlay hidden"></div>
 
   <main class="app-shell">
+    <!-- LOGIN SCREEN -->
     <section id="authBox" class="card auth-card">
       <h2>Login</h2>
       <p class="muted">Enter your email and password.</p>
@@ -69,6 +80,7 @@
       <p class="spam-note">Check your spam or junk folder if you do not see the reset email.</p>
     </section>
 
+    <!-- ACCOUNT CREATION SCREEN -->
     <section id="signupBox" class="card auth-card hidden">
       <h2>Create Account</h2>
       <p class="muted">New users need to enter their name once.</p>
@@ -90,7 +102,9 @@
       <button id="backToLoginBtn" class="outline-btn">Back to Login</button>
     </section>
 
+    <!-- AUTHENTICATED APPLICATION PAGES -->
     <section id="appPages" class="app-pages hidden">
+      <!-- EMPLOYEE HOME: punch clock and personal weekly schedule -->
       <section id="clockPage" class="app-page active-page">
         <div class="home-dashboard">
           <section id="clockBox" class="card home-clock-card">
@@ -136,6 +150,7 @@
         </div>
       </section>
 
+      <!-- EMPLOYEE TIME-OFF REQUEST PAGE -->
       <section id="timeOffPage" class="app-page hidden">
         <section id="timeOffBox" class="card">
           <h2>Time Off Request</h2>
@@ -158,6 +173,7 @@
         </section>
       </section>
 
+      <!-- EMPLOYEE TIME-EDIT REQUEST PAGE -->
       <section id="timeEditPage" class="app-page hidden">
         <section id="timeEditBox" class="card">
           <h2>Time Edit Request</h2>
@@ -188,6 +204,7 @@
         </section>
       </section>
 
+      <!-- EMPLOYEE PROFILE / PASSWORD RESET PAGE -->
       <section id="profilePage" class="app-page hidden">
         <section id="profileBox" class="card">
           <h2>My Profile</h2>
@@ -211,6 +228,7 @@
         </section>
       </section>
 
+      <!-- EMPLOYEE PUNCH HISTORY PAGE -->
       <section id="historyPage" class="app-page hidden">
         <section id="myHistoryBox" class="card">
           <h2>My Punch History</h2>
@@ -227,6 +245,7 @@
         </section>
       </section>
 
+      <!-- EMPLOYEE WEEKLY SIGNATURE PAGE -->
       <section id="signaturePage" class="app-page hidden">
         <section id="signatureBox" class="card">
           <h2>Weekly E-Signature</h2>
@@ -241,6 +260,7 @@
         </section>
       </section>
 
+      <!-- ADMIN: BUILD AND EDIT EMPLOYEE SCHEDULES -->
       <section id="adminScheduleBuilderPage" class="app-page hidden admin-page" data-permission="canManageSchedules">
         <section class="card">
           <h2>Schedule Builder</h2>
@@ -297,6 +317,7 @@
         </section>
       </section>
 
+      <!-- ADMIN: REVIEW POSTED SCHEDULES -->
       <section id="adminPostedSchedulesPage" class="app-page hidden admin-page" data-permission="canManageSchedules">
         <section class="card">
           <h2>Posted Schedules</h2>
@@ -313,6 +334,7 @@
         </section>
       </section>
 
+      <!-- ADMIN: APPROVE OR REJECT TIME-OFF REQUESTS -->
       <section id="adminTimeOffPage" class="app-page hidden admin-page" data-permission="canManageTimeOff">
         <section class="card">
           <h2>Time Off Approvals</h2>
@@ -326,6 +348,7 @@
         </section>
       </section>
 
+      <!-- ADMIN: APPROVE OR REJECT TIME-EDIT REQUESTS -->
       <section id="adminTimeEditPage" class="app-page hidden admin-page" data-permission="canManageTimeEdits">
         <section class="card">
           <h2>Time Edit Approvals</h2>
@@ -339,6 +362,7 @@
         </section>
       </section>
 
+      <!-- ADMIN: VIEW ALL WEEKLY HOURS -->
       <section id="adminWeeklyRecordsPage" class="app-page hidden admin-page" data-permission="canViewAllHours">
         <section class="card">
           <h2>Weekly Records</h2>
@@ -355,6 +379,7 @@
         </section>
       </section>
 
+      <!-- ADMIN: VIEW WEEKLY SIGNATURES -->
       <section id="adminSignaturesPage" class="app-page hidden admin-page" data-permission="canViewSignatures">
         <section id="signatureAdminBox" class="card">
           <h2>Weekly Signatures Log</h2>
@@ -368,6 +393,7 @@
         </section>
       </section>
 
+      <!-- ADMIN: CORRECT OR SOFT-DELETE PUNCHES -->
       <section id="adminPunchEditorPage" class="app-page hidden admin-page" data-permission="canManagePunches">
         <section class="card">
           <h2>Edit Employee Punches</h2>
@@ -388,6 +414,7 @@
     <p id="footerNote" class="footer-note hidden">Fastech Critical Power Systems · All times are local.</p>
   </main>
 
+  <!-- ADMIN PUNCH EDIT MODAL -->
   <div id="editPunchModal" class="modal hidden">
     <div class="modal-card">
       <button id="closeEditPunchBtn" class="close-btn">×</button>
@@ -415,6 +442,7 @@
     </div>
   </div>
 
+  <!-- Main application logic; type="module" is required for Firebase imports. -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
